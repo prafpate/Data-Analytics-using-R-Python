@@ -1,0 +1,141 @@
+---
+title: "Final Presentation "
+author: "Prafful Patel"
+
+---
+
+```{r}
+library(tidyverse)
+library(MLmetrics)
+```
+
+
+> The Dataset is about the Carbon Dioxide emissions from various types of fuels and other sources per year, per nation which amounts to the increase in CO2. 
+This dataset is collected from the Carbon Dioxide Analysis Center(CDAC). These surveys were conducted from the year 1751 to 2014. The data spans over one table that contains 17232 observations and 10 variables that contain varied information. The types of data used are of integer, character and numeric types. The CO2 emission data is present in million metric ton of Carbon.
+> Missing Values: The data for Bunker_fuels is not included in Total.
+
+
+```{r}
+EmissionData<- read.csv("F:/Advance_Data_Analytics/Project/CO2/yearviseemissiondata.csv", header=TRUE)
+str(EmissionData)
+
+```
+
+
+```{r}
+summary(EmissionData$Total)
+hist(EmissionData$Total)
+```
+> The histogram is right skewed and it shows the total carbon emission between 0 to 250k million metric ton that is occured at a frequency of greater than 15000 times.
+
+
+```{r}
+boxplot(EmissionData$Total)
+
+```
+
+> By looking at the boxplot we cannot conclude any results as there are too many outliers with data being very compact.
+
+
+
+```{r}
+response_outliers<- boxplot.stats(EmissionData$Total)$out
+data<- subset(EmissionData,!Total %in% response_outliers) #data is without outlier
+
+hist(data$Total)
+boxplot(data$Total)
+summary(data$Total)
+```
+> Above is the code that constructs the histogram and boxplot when the outliers are eliminated for better representation of the data due to the data being too compact. 
+
+
+```{r}
+ggplot(data = EmissionData) +
+  geom_count(mapping = aes(x = Year, y = Total))
+```
+
+> The above scatter plot indicates the carbon emission is continously increasing with respect to the year.
+
+
+>HYPOTHESIS
+
+>We will be doing a hypothesis on two datasets 
+1. Datafrom1994to2003 this data set includes data from year 1994 to 2003.
+2. After2003 this data set inlcudes data from year 2004 to 2014.
+By the Hypothesis testing we will figure out the Total CO2 emission from years 1994 to 2003 and from years 2004 to 2014 is increasing or not.
+
+\begin{align*}
+H_0: \mu1 & = \mu2, \\
+H_1: \mu1 & \ne \mu2. 
+\end{align*}
+
+```{r}
+datafrom1994to2003<-subset.data.frame(EmissionData,EmissionData$Year > 1993 & EmissionData$Year < 2004 )
+summary(datafrom1994to2003)
+
+after2003<-subset.data.frame(EmissionData,EmissionData$Year > 2003)
+summary(after2003)
+```
+
+```{r}
+t.test(datafrom1994to2003$Total,after2003$Total, var.equal = FALSE, conf.level = .95)
+```
+
+> We are using t.test because we have two means and the variance are unknown and are not equal.
+>The p-value is greater than alpha i.e., 0.05. So we can accept the null hypothesis H_0 and agree that the increase of Total CO2 emission from year 1994 to 2003 is equal to the increase of Total CO2 emission from year 2004 to 2014.
+
+
+>REGRESSION
+
+> Total is Response and Solid_Fuel,Liquid_Fuel, Gas_Fuel, Cement, Gas_Flaring, Bunker_fuels is Predictor.
+
+```{r}
+fitlm <- lm(Total ~.-Country-Year, data=EmissionData)
+summary(fitlm)
+
+```
+
+> By performing the Multiple Linear Regression we found that there is strong relationship between Response and all predictors because the p-value of each model is close to 0 except Per_Capita and Bunker_fuels because they don't have direct relationship with Total CO2 emission.
+
+> The relationship between Response and all Predictors is Positive because the coefficient value is positive which means Response is directly propotional to the Predictor.
+
+> The model is a very fit model because the R-squared value is 1 and the RSE value is very close to 0.
+
+
+```{r}
+plot(EmissionData$Total, EmissionData$Solid_Fuel)
+abline(fitlm, col="red")
+
+plot(EmissionData$Total, EmissionData$Liquid_Fuel)
+abline(fitlm, col="red")
+
+plot(EmissionData$Total, EmissionData$Gas_Fuel)
+abline(fitlm, col="red")
+
+plot(EmissionData$Total, EmissionData$Cement)
+abline(fitlm, col="red")
+
+plot(EmissionData$Total, EmissionData$Gas_Flaring)
+abline(fitlm, col="red")
+
+plot(EmissionData$Total, EmissionData$Per_Capita)
+abline(fitlm, col="red")
+
+plot(EmissionData$Total, EmissionData$Bunker_fuels)
+abline(fitlm, col="red")
+```
+
+
+
+```{r}
+library(MLmetrics)
+ypred <-predict(object = fitlm, newdata = EmissionData)
+summary(ypred)
+
+MAE(y_pred = ypred, y_true = EmissionData$Total)
+
+MSE(y_pred = ypred, y_true = EmissionData$Total)
+```
+
+> And the Mean Absolute Error and Mean Squared Error are very low.
+
