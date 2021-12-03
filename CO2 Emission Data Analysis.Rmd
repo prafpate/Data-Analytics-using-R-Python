@@ -12,7 +12,7 @@ library(MLmetrics)
 
 > The Dataset is about the Carbon Dioxide emissions from various types of fuels and other sources per year, per nation which amounts to the increase in CO2. 
 This dataset is collected from the Carbon Dioxide Analysis Center(CDAC). These surveys were conducted from the year 1751 to 2014. The data spans over one table that contains 17232 observations and 10 variables that contain varied information. The types of data used are of integer, character and numeric types. The CO2 emission data is present in million metric ton of Carbon.
-> Missing Values: The data for Bunker_fuels is not included in Total.
+
 
 
 ```{r}
