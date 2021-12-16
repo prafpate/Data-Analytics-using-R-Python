@@ -1,0 +1,223 @@
+---
+title: "Final Presentation "
+author: "Prafful Patel"
+
+---
+
+```{r}
+library(tidyverse)
+library(MLmetrics)
+```
+
+
+> The Dataset is about the Carbon Dioxide emissions from various types of fuels and other sources per year, per nation which amounts to the increase in CO2. 
+This dataset is collected from the Carbon Dioxide Analysis Center(CDAC). These surveys were conducted from the year 1950 to 2014. The data spans over one table that contains 17232 observations and 10 variables that contain varied information. The types of data used are of integer, character and numeric types. The CO2 emission data is present in million metric ton of Carbon.
+
+
+
+```{r}
+EmissionData<- read.csv("F:/Advance_Data_Analytics/Project/CO2/yearviseemissiondatafrom1950.csv", header=TRUE)
+str(EmissionData)
+
+```
+
+
+```{r}
+summary(EmissionData$Total)
+hist(EmissionData$Total)
+```
+> The histogram is right skewed and it shows the total carbon emission between 0 to 250k million metric ton that is occured at a frequency of greater than 10000 times.
+
+
+```{r}
+boxplot(EmissionData$Total)
+
+```
+
+> By looking at the boxplot we cannot conclude any results as there are too many outliers with data being very compact.
+
+
+
+```{r}
+response_outliers<- boxplot.stats(EmissionData$Total)$out
+data<- subset(EmissionData,!Total %in% response_outliers) #data is without outlier
+
+hist(data$Total)
+boxplot(data$Total)
+summary(data$Total)
+```
+> Above is the code that constructs the histogram and boxplot when the outliers are eliminated for better representation of the data due to the data being too compact. 
+
+
+```{r}
+ggplot(data = EmissionData) +
+  geom_count(mapping = aes(x = Year, y = Total, color = 'RED'))
+```
+
+> The above scatter plot indicates the carbon emission is continously increasing with respect to the year.
+
+
+```{r}
+Top<- read.csv("F:/Advance_Data_Analytics/Project/CO2/Top10yearvise.csv", header=TRUE)
+str(Top)
+```
+
+> The above dataset consist data of top 10 countries to closely examine the data. By this we can figure which country is emitting more CO2 in the air. And to know which Country is responsible for Most and Least CO2 emission we can find out this using two methods. First is by using Data Visualization technique and another one is by using data frame operation. You can see both methods below.
+
+> By using Data Visualization
+
+```{r}
+ggplot(data = Top, mapping = aes(x = Year)) +
+  geom_line(aes(y = Total,colour = Country)) 
+
+ggplot(data = Top, mapping = aes(x = Year)) +
+  geom_line(aes(y = Solid_Fuel,colour = Country)) 
+
+ggplot(data = Top, mapping = aes(x = Year)) +
+  geom_line(aes(y = Liquid_Fuel,colour = Country)) 
+
+ggplot(data = Top, mapping = aes(x = Year)) +
+  geom_line(aes(y = Gas_Fuel,colour = Country)) 
+
+ggplot(data = Top, mapping = aes(x = Year)) +
+  geom_line(aes(y = Cement,colour = Country)) 
+
+ggplot(data = Top, mapping = aes(x = Year)) +
+  geom_line(aes(y = Gas_Flaring,colour = Country)) 
+
+ggplot(data = Top, mapping = aes(x = Year)) +
+  geom_line(aes(y = Bunker_fuels,colour = Country)) 
+```
+
+>By using Data frame operations. For using Data frame technique we have prepared a data frame where data is segreated countryvise. Where the data of which is distributed into years of CO2 emission from various Fuels is combined  into one Final column which respect to each country.
+
+
+
+```{r}
+country<- read.csv("F:/Advance_Data_Analytics/Project/CO2/countryviseemissiondata.csv", header=TRUE)
+str(country)
+
+country$Country[which.max(country$Total)]
+country$Country[which.min(country$Total)]
+
+```
+> From the above operation we can see United States of America emitted the higest CO2 from all the fuels combined and Marshalls Islands emitted the least.
+
+```{r}
+country$Country[which.max(country$Solid_Fuel)]
+country$Country[which.min(country$Solid_Fuel)]
+```
+>United States of America emitted the higest CO2 from all the SOlid Fuels combined and Andorra emitted the least.
+
+```{r}
+country$Country[which.max(country$Liquid_Fuel)]
+country$Country[which.min(country$Liquid_Fuel)]
+```
+>United States of America emitted the higest CO2 from all the Liquid Fuels combined and Liechtenstein emitted the least.
+
+```{r}
+country$Country[which.max(country$Gas_Fuel)]
+country$Country[which.min(country$Gas_Fuel)]
+
+```
+
+>United States of America emitted the higest CO2 from all the Gas Fuels combined and Andorra emitted the least.
+
+```{r}
+country$Country[which.max(country$Cement)]
+country$Country[which.min(country$Cement)]
+
+```
+>China emitted the higest CO2 from Cement and Andorra emitted the least.
+
+```{r}
+country$Country[which.max(country$Gas_Flaring)]
+country$Country[which.min(country$Gas_Flaring)]
+```
+>IRAN emitted the higest CO2 from Gas Flaring and Albania emitted the least.
+
+
+```{r}
+country$Country[which.max(country$Bunker_fuels)]
+country$Country[which.min(country$Bunker_fuels)]
+```
+>United States of America emitted the higest CO2 from the Bunker Fuels and Andorra emitted the least.
+
+
+
+>HYPOTHESIS
+
+>We will be doing a hypothesis on two datasets 
+1. Datafrom1994to2003 this data set includes data from year 1994 to 2003.
+2. After2003 this data set inlcudes data from year 2004 to 2014.
+By the Hypothesis testing we will figure out the Total CO2 emission from years 1994 to 2003 and from years 2004 to 2014 is increasing or not.
+
+\begin{align*}
+H_0: \mu1 & = \mu2, \\
+H_1: \mu1 & \ne \mu2. 
+\end{align*}
+
+```{r}
+datafrom1994to2003<-subset.data.frame(EmissionData,EmissionData$Year > 1993 & EmissionData$Year < 2004 )
+summary(datafrom1994to2003)
+
+after2003<-subset.data.frame(EmissionData,EmissionData$Year > 2003)
+summary(after2003)
+```
+
+```{r}
+t.test(datafrom1994to2003$Total,after2003$Total, var.equal = FALSE, conf.level = .95)
+```
+
+> We are using t.test because we have two means and the variance are unknown and are not equal.
+>The p-value is greater than alpha i.e., 0.05. So we can accept the null hypothesis H_0 and agree that the increase of Total CO2 emission from year 1994 to 2003 is equal to the increase of Total CO2 emission from year 2004 to 2014.
+
+
+>REGRESSION
+
+> Total is Response and Solid_Fuel,Liquid_Fuel, Gas_Fuel, Cement, Gas_Flaring, Bunker_fuels is Predictor.
+
+```{r}
+fitlm <- lm(Total ~.-Country-Year, data=EmissionData)
+summary(fitlm)
+
+```
+
+> By performing the Multiple Linear Regression we found that there is strong relationship between Response and all predictors because the p-value of each model is close to 0 except Per_Capita and Bunker_fuels because they don't have direct relationship with Total CO2 emission.
+
+> The relationship between Response and all Predictors is Positive because the coefficient value is positive which means Response is directly propotional to the Predictor.
+
+> The model is a very fit model because the R-squared value is 1 and the RSE value is very close to 0.
+
+> To see the coorelation matrix of response and the predictors we have to make a small change in the dataset. We have to remove all thode Predictors which are other than Integer because coorelation matrix will only generate if the response and all the predictors are Integer.
+
+
+```{r}
+EmissionData1<- select(EmissionData,-Country)
+str(EmissionData1)
+
+library(ISLR)
+
+
+i <- sample(2, nrow(EmissionData1), replace=TRUE, prob=c(0.8,0.2))
+EmissionDataTraining <- EmissionData1[i==1,]
+EmissionDataTesting <- EmissionData1[i==2,]
+
+pairs(EmissionDataTraining[,1:8],lower.panel =NULL)
+```
+
+> By the coorelation matrix you can see the relation between Response and all the Predictors using plot points. 
+
+
+```{r}
+library(MLmetrics)
+ypred <-predict(object = fitlm, newdata = EmissionData)
+summary(ypred)
+
+MAE(y_pred = ypred, y_true = EmissionData$Total)
+
+MSE(y_pred = ypred, y_true = EmissionData$Total)
+```
+
+> And the Mean Absolute Error and Mean Squared Error are very low.The model is the best model.
+
